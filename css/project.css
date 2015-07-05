@@ -1,0 +1,12 @@
+.nature-panel {
+    background-color: black !important;
+}
+.math-panel {
+    background-color: indianred!important;
+}
+.languages-panel {
+    background-color: lightsteelblue !important;
+}
+.languages-panel h5 {
+    color: darkslategray !important;
+}

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hackathon Project</title>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <link href="css/theme/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="css/project.css" type="text/css">
+        <!-- full calendar -->
+        <link href='plugins/fullcalendar-2.3.2/fullcalendar.css' rel='stylesheet' />
+        <link href='plugins/fullcalendar-2.3.2/fullcalendar.print.css' rel='stylesheet' media='print' />
+        <script src='plugins/fullcalendar-2.3.2/lib/moment.min.js'></script>
+        <script src='plugins/fullcalendar-2.3.2/lib/jquery.min.js'></script>
+        <script src='plugins/fullcalendar-2.3.2/lib/jquery-ui.custom.min.js'></script>
+        <script src='plugins/fullcalendar-2.3.2/fullcalendar.min.js'></script>
+        <script src='plugins/fullcalendar-2.3.2/lang/pt-br.js'></script>
+        <link rel="stylesheet" type="text/css" href="css/theme/dist/css/sb-admin-2.css">
+        <link href="css/theme/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+        <link href="css/theme/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="css/project.css" type="text/css">
+        
+        <!-- jQuery 
+        <script src="css/theme/bower_components/jquery/dist/jquery.min.js"></script>
+        -->
+
+        <!-- Bootstrap Core JavaScript -->
+        <script src="css/theme/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        
+        <script>
+    function save(){
+        var events = $('#calendar').fullCalendar('clientEvents');
+        var s = [];
+        for(e in events){
+            var pushE = {
+                "title":events[e].title,
+                "start":events[e].start._d
+            }
+            if(!(events[e].end==null)){
+                pushE.end = events[e].end._d;
+            }
+            s.push(pushE);
+        }
+        $.ajax({
+            url: "http://localhost:3000/up",
+            type: 'get',
+            data: {"e":JSON.stringify(s)},
+            success: function(data) {
+                console.log(data);
+            }
+         });
+    }
+
+    $(document).ready(function() {
+        $('#external-events .fc-event').each(function() {
+            $(this).data('event', {
+                title: $.trim($(this).text()), // use the element's text as the event title
+                stick: true // maintain when user navigates (see docs on the renderEvent method)
+            });
+
+            // make the event draggable using jQuery UI
+            $(this).draggable({
+                zIndex: 999,
+                revert: true,      // will cause the event to go back to its
+                revertDuration: 0  //  original position after the drag
+            });
+
+        });
+        $.ajax({
+            url: "http://localhost:3000/getsource",
+            type: 'get',
+            dataType: 'json',
+            success: function(data) {
+                if(data){
+                window.conteudo = data;
+                } else {
+                window.conteudo = {"source":
+                                        [{
+                                          "title": "Clique para remover",
+                                          "start": new Date()
+                                        }]
+                                    };
+                }
+                $('#calendar').fullCalendar({
+                    header: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'month,agendaWeek,agendaDay'
+                    },
+                    eventClick: function(calEvent, jsEvent, view) {
+                        $('#calendar').fullCalendar('removeEvents', function (event) {
+                            return event == calEvent;
+                        });
+                    },
+                    editable: true,
+                    droppable: true, // this allows things to be dropped onto the calendar
+                    drop: function() {
+                        // is the "remove after drop" checkbox checked?
+                        if ($('#drop-remove').is(':checked')) {
+                            // if so, remove the element from the "Draggable Events" list
+                            $(this).remove();
+                        }
+                    },
+                    events: window.conteudo.source
+                });
+            }
+         });
+    });
+
+</script>
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+    <div class="container">
+    <div class="row">
+    <div class="col-xs-12 col-lg-12">
+        <h1>Bem Vindo, Fulano!</h1>
+        <p>Organize seu calendário de estudos</p>
+    </div>
+
+    <div id='external-events' class="col-lg-3 col-xs-12">
+        <h4>Disciplinas</h4>
+        <div class="panel panel-green">
+            <div class="panel-heading nature-panel">
+                <div class="row">
+                    <div class="col-xs-12 col-lg-3">
+                        <img src="images/nature/earth.png" alt="Earth Globe" class="img-responsive" />
+                    </div>
+                    <div class="col-xs-12 col-lg-9 text-right">
+                        <h5>Ciências da Natureza</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class='fc-event label label-info nature'>Física</div>
+                <div class='fc-event label label-info nature'>Química</div>
+                <div class='fc-event label label-info nature'>Biologia</div>
+            </div>
+        </div>
+        
+        <div class="panel panel-green">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-12 col-lg-3">
+                        <img src="images/humans/science.png" class="img-responsive" />
+                    </div>
+                    <div class="col-xs-12 col-lg-9 text-right">
+                        <h5>Ciências Humanas</h5>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel-footer">
+                <div class='fc-event label label-info humans'>História</div>
+                <div class='fc-event label label-info humans'>Geografia</div>
+                <div class='fc-event label label-info humans'>Filosofia</div>
+                <div class='fc-event label label-info humans'>Sociologia</div>
+            </div>
+        </div>
+        
+        
+        <div class="panel panel-red">
+            <div class="panel-heading math-panel">
+                <div class="row">
+                    <div class="col-xs-12 col-lg-3">
+                        <img src="images/math/ruler_pencil_geometry.png" alt="Earth Globe" class="img-responsive" />
+                    </div>
+                    <div class="col-xs-12 col-lg-9 text-right">
+                        <h5>Matemática e suas Tecnologias</h5>
+                    </div>
+                </div>
+            </div>
+            <a href="#">
+                <div class="panel-footer">
+                    <div class='fc-event label label-info math'>Matemática</div>
+                </div>
+            </a>
+        </div>
+        
+        
+        <div class="panel panel-info">
+            <div class="panel-heading languages-panel">
+                <div class="row">
+                    <div class="col-xs-12 col-lg-3">
+                        <img src="images/writing/pencil.png" class="img-responsive" />
+                    </div>
+                    <div class="col-xs-12 col-lg-9 text-right">
+                        <h5>Linguagens, Códigos e suas Tecnologias</h5>
+                    </div>
+                </div>
+            </div>
+            <a href="#">
+                <div class="panel-footer">
+                    <div class='fc-event label label-info languages'>Língua Portuguesa</div>
+                    <div class='fc-event label label-info languages'>Língua Estrangeira</div>
+                    <div class='fc-event label label-info languages'>Redação</div>
+                    <div class='fc-event label label-info languages'>Artes</div>
+                </div>
+            </a>
+        </div>     
+    </div>
+        
+        <div id='calendar' class="col-lg-9 col-xs-12"></div>
+        
+        
+        
+        <div class="col-lg-9 pull-right">
+            <div class="panel-footer">
+            <button class="btn btn-success pull-right" onclick="save()"><i class="fa fa-check"></i> Salvar Horário</button>
+            </div>
+        </div>
+        
+		
+    </div>
+    </div>
+	</div>
+    
+    <!-- Custom Theme JavaScript -->
+    <script src="css/theme/dist/js/sb-admin-2.js"></script>
+    </body>
